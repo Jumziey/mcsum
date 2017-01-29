@@ -297,5 +297,251 @@ Looking back at this example we can also see that maybe we can not just occupy o
 
 We could almost go as far as calling $\pi$ for a state itself though, although that could be slightly misleading. This eigenvector of the transition matrix is also sometimes called the probability distribution of the system. Something that is done in the summarized book. This can be defended as to this actually becomes the pdf when we reached the steady state, so it's not completely dumb.
 ### Construct the Transition Matrix
-So lets say we have the $\pi$ or pdf we want to have a transition matrix to. How do we construct a transition matrix?  
+So lets say we have the $\pi$ or pdf we want to have a transition matrix to. How do we construct a transition matrix? Well the book doesn't really wanna tell us that even though the title of the section misleads us to belive that (fuck sakes... Fuck fuck fuck, this is an R-rated text you know).
+
+But we do go through detailed balance which can be shown to be a requirement on a transition matrix that ensures its valid. This detailed balance is
+\[
+ \pi_i p_{ij} = p_j p_{ji}
+\]
+And holds because if it holds then we can rewrite $\sum_i \pi_i p_{ij}$ as $\pi_j \sum_i p_{ji}$ which is equal to $\pi_j$. Thus we prove that all $\pi_i$:s (rembember the summation sign) together has probability to enter state $\pi_j$ that is equal to $\pi_j$ (i know... confusing)
+
+Basically what gets confusing is that we refer to $\pi_j$ as a state as in a circle we can occupy AND the probability to just be in $\pi_j$ after any given transition, not really paying attention to previous states you had.  Just make sure to keep an eye out for that.
+
+One other thing that is done, is splitting up the probability into two parts, the probability for a transition to be suggested and the probability for a transition to be accepted. This is utter nonsense in its context. This _will_ be used later in the book, but as for right now it really don't hold any merit and as you google on it seems it's only the author who likes doing it this way right now. Anyhow, since it will be usable in a lab later lets talk about splitting $p_{ij}$
+\[
+p_{ij} = q_{ij}\alpha_{ij}
+\]
+Where $q_{ij}$ is the probability for transition to be suggested and $\alpha_{ij}$ is the probability for acceptance.
+Using this construction the detailed balance can be enforced through
+\[
+\alpha_{ij} = min(1, \frac{\pi_j q_{ji}}{\pi_i q_{ij}})
+\]
+
+According to the book one often wants a symmetric targeting probability so $q_{ij} = q_{ji}$ then the detailed balance becomes
+\[
+\alpha_{ij} = min(1, \frac{\pi_j}{\pi_i})
+\]
+this is called the metropolis algorithm.
 ### Correlations
+Imagine A is a certain state of sorts. So A(t) is the measured value of A at a time t (people at Mexican restaurant anyone?) and $\langle A \rangle$ is the mean value or solved for value
+\[
+\delta A(t) = A(t) - \langle A \rangle
+\]
+then the time correlation function for the quantity $A$ is
+\[
+C_A(t) = \langle \delta A(t') \delta A(t'+t) \rangle
+\]
+I assume $t'$ is small? Like at most a few state transitions? Why this is the case i don't know... it's just a gut feeling :S
+
+This correlation also kinda decays exponentially... Some slightly jumpy and confusing math in the book we get showned that
+\[
+ C_A(t) \approx e^{-t/\tau}
+\]
+for sufficently large $t$
+
+#Ch. 3 - The Lennard-Jones gas
+We want to do Monte Carlo simulation of a classical gas.
+
+First the different ensembles are reviewed. Then we look at the equations and interpret them as something that depends on the different free energies as Legendre transformation of the _entropy_. We then do a short comparison of molecular dynamics and Monte Carlo simulations.
+
+After this we move on to look at the steps necessary to go from the quantum formulation of statistical mechanics to a classical formulation where each microscopic state is defined through the positions and the momentum of all the particles. In that section we laso give the simple recipe for a Monte Carlo simulation in a gas of interacting particles.
+
+We then go on and look at the additional steps required to include volume fluctuations, which are needed in simulations with constant pressure. Lastly we look at the steps required to deal with creation and annihilation of particles, something that is needed for the Grand Canonical ensemble.
+
+## Summary of the different ensembles
+### Microcanonical ensemble
+__Clarification:__ In the microcanonical ensemble we look at the entropy of the system as a function of the volume, energy and number of particles.
+
+The basic behind equilibrium statistical physics is that all states with the same energy are equally likely to show up. Lets imagine a sytem wehere we can control the entropy, $S$, the volume, $V$, and the number of particles, $N$. This system would me describide by the internal energy
+\[
+E(S,V,N)
+\]
+We then submit that infinitesimal changes of the control variables change $E$ as following (\mu reprents the chemical potential)
+\[
+dE = TdS - pdV + \mu dN
+\]
+And according to the book, and statistical physics, (we don't present the proof here) the system can be described through entropy as
+\[
+S(E,V,N) = k_B ln\Omega(E,V,N)
+\]
+where $\omega$ is the amount of states with a certain energy described as follows (Note that $\delta$ is the delta function which evaluate to $1$ only when $x=0$, otherwise zero, and $v$ is the amount of state that exists)
+\[
+\Omega(E,V,N) = \sum_v \delta(E - E_v)
+\]
+
+### Canonical ensemble
+__Clarification:__ In the canonical ensamble we look at a system as a function of temperature, volume and number of particles. The entropy might then fluctuate. The resulting function we look at then is the Helmholtz free energy
+
+Helmholtz free energy, $F$, is described as (through something called a Legendre transformation)
+\[
+ F(T,V,N) = E(S,V,N) - TS
+\]
+The differential is
+\[
+ dF = -SdT - pdV + \mu dN
+\]
+The probability of a configuration to show up is proportional to the Boltzmann factor, $e^{-\beta E_v}$, where $\beta  = 1/(k_B T)$.
+
+We have a basic quantity in statistical physics we call the partition function. This is built up of a sum of Boltzmann factors. This can be taken as something that comes up again and again, and therfore interesting. This partition is defined as
+\[
+Z(T,V,N) = \sum_v e^{-\beta E_v}
+\]
+And we can use this to defined the Helmholtz free energy as (just take it at face value)
+\[
+ F(T,V,N) = -k_BT\ln{Z(T,V,N)}
+\]
+The expectation value of an observable can now be written as
+\[
+\langle A \rangle = \sum_v P_v A_v = \frac{1}{Z} \sum_v A_v e^{-\beta E_v}
+\]
+And especially for the energy using the partition function and the differentials we defined so far
+\[
+\langle E \rangle = \frac{1}{Z} \sum_v E_v e^{-\beta E_v} = - \frac{1}{Z} \frac{\partial Z}{\partial \beta} = - \frac{\partial ln Z}{\partial \beta}
+\]
+And the heat capacatiy can be determined from the fluctuations in the energy (this is only needed to be given)
+\[
+C = \frac{\partial \langle E \rangle}{\partial T} = \frac{1}{k_B T^2} ( \langle E^2 \rangle - \langle E \rangle^2)
+\]
+### Constant pressure ensamble
+Well what if we want to set the temperaturel pressure and number of particles fixed? Well the constant pressure ensemble to your rescue! Using a transform we magically used earlier (Legendres) we can create a new ensemble
+\[
+G(T,p,N) = F(T,V,N) + pV
+\]
+With the differential
+\[
+dG = -SdT + V dp + \mu dN
+\]
+the generalization of the partition function in this case becomes
+\[
+\Phi(T,p,N) = \sum_V e^{-\beta pV}Z(T,V,N)
+\]
+and we get
+\[
+G= -k_B T \ln{\Phi}
+\]
+### Grand canonical ensemble
+Here we have the temperature, volume, chemical potential set. So through transformations we get the ensemble
+\[
+F_G(T,V,\mu) = F(T,V,N) + \mu N
+\]
+With the differential
+\[
+dF_G = -SdT - pdV + Nd\mu
+\]
+and
+\[
+F_G = k_B T \ln{\Xi}
+\]
+where
+\[
+\Xi (T,V,\mu) = \sum_N e^{\beta \mu N} Z(T,V,N)
+\]
+
+## Gibbs entropy formulation
+The seemingly only interesting forumla in this section is for the microcanonical ensembles entropy where we derive
+\[
+S(E,N,V) = k_B \ln{\Omega}
+\]
+## Monte Carlo versus Molecular Dynamics
+In molecular dynamics we look at the position of particles and its velocity to simulate the gas
+\[
+\dot{\mathbf{r}}_i = \mathbf{v}_i
+\]
+\[
+m\dot{\mathbf{v}}_i = \sum_{j \ne i} \mathbf{F}_{ij}
+\]
+And for these molecular dynamics one start with specifiyng the the energy $E = m \langle v^2 \rangle /2$, the volume and the number of particles. Then through intergrations from forces one calculate positions and then calculate again for each timestep. This is interesting if one want to see how the gas evolves over time, but if the goal is only to see the steady state, the state the whole gas will eventually reach stably, then Markov chain is equally good. Infact from a simualtion perspective is allot simpler to execute, thus creates a faster simulation that can, for instance, deal with much larger systems.
+
+In markov chain simulations of a classical gas, one only take into consideration the position of the particles. Then for every state transition there is a probability for a new state to be given for each particle and a certain probability for it to be accepted (Why this is so is not clearly explained yet, why cant there just be one probability?). Thus it's completely stochastic. One also typically use the canonical ensemble and set the temperature and let the energy in the system fluctuate instead.(Why this is simpler is probably due to some math thing, but yet again not properly argued for in the textbook).
+## Classical statistical mechanics
+Here we basically look at the partition funcion for the canonical ensamble
+\[
+Z(T,V,N) = \sum_v e^{-\beta E_v}
+\]
+Then go on to say that we look at the gas in a quantum way, so ceah microscopic state is then a point in what we call a phase space $(\mathbf{r}_1,\mathbf{r}_2,...,\mathbf{r}_N; \mathbf{p}_1,\mathbf{p}_2, ..., \mathbf{p}_N) \equiv (r^N,p^N)$. (Note that this is for $N$ particles, all particles together make up our state, and each particle has a position and a momentum).
+
+We then look at the energy of the system, and this is built up of the kinetic energy (dependent on the momentum) and the potential energy (dependent on the position). For the kinetic energy we say its usually given by
+\[
+K(p^N) = \frac{1}{2m} \sum_i \mathbf{p}_i^2
+\]
+and that the potential energy is usually given dependent on the problem.
+
+We then look at the phase space as a continuum and find a new expression for the partition function as
+\[
+Z = \frac{1}{N!} \frac{1}{v_Q^N} \int dr^Ne^{-\beta U(r^N)}
+\]
+where
+\[
+v_Q = (h/\sqrt{2\pi m k_B T})^3
+\]
+which comes from integrating the kinetic energy.
+
+If you forget the goal with this, the goal is to get an expression we can easily calculate with a computer.
+### To calculate expectation values
+We now plug in the canonical expression for expectation value with our rewritten partition function and get
+\[
+\langle A \rangle = \frac{1}{Z}\frac{1}{N!} \frac{1}{v_Q^N} \int dr^N A(r^N) e^{-\beta U(r^N)}
+\]
+So how do we use this to practically calculate the expectation value in a simulation? We have two choices.
+
+Calculate it kind of directly from the derived equation.
+\[
+\langle A \rangle = \frac{\sum_{v=1}^n A_v e^{-\beta E_V}}{\sum_{v=1}^n e^{-\beta E_V}}
+\]
+Where $n$ is the number of (Depending on system how many is needed) randomly generated $r^N$ configurations and $\mathbf{r}_i$ is independent. (Note that we just pick and choose positions here, 100% randomly).
+
+The problem with this approach is that the summations tend to become very large and basically explode in size so that no feasible computer could calculate it for many systems.
+
+The other approach is to use Markov chain Monte Carlo to generate the configurations with a probability $\pi_v \propto e^{-\beta E_v}$ to enter a certain state $v$. Then the expectation values should be calculated as simple averages
+\[
+\langle A \rangle = \frac{1}{n} \sum^n_{v=1} A_v
+\]
+A very effective way. But $A_v$ wont be independent of eachother.
+### Pair interaction
+Now we're finally looking at the potential. We're approximating the interaction energy by a sum of pair interactions:
+\[
+ U(r^N) = \sum_i \sum_{j>i}u(|\mathbf{r}_i - \mathbf{r}_j |)
+\]
+and now we finally get to the specifics of Lennard-Jones. Lennard-Jones defines this $u$ potential to be
+\[
+u_{LJ}(r) = 4\epsilon [ (\frac{\sigma}{r})^{12} - (\frac{\sigma}{r})^6 ]
+\]
+The minimum of this potential which is (for whatever reason this feels in the book as notable)
+\[
+u_{LJ}(r_{min}) = - \epsilon, r_{min} = 2^{1/6}\sigma
+\]
+### Recipe for a Monte Carlo simulation
+0. Initialize by generating $N$ postitions $\mathbf{r}_i$ by random.
+1. Set $i=0$
+2. Let $v$ denote the present configuration. Suggest a change $\mathbf{r}_i  \to \mathbf{r}_i + \Delta\mathbf{r};$ denote this trial configuration by $v'$. Here $\Delta \mathbf{r}$ is a random vector where each component is usually from a uniform distribution, $-\epsilon \le \Delta r_{\mu} \le \epsilon$
+3.   Calculate the energy difference $U_{v'} - U_v$ and accept the new configuration with probability $\alpha_{v \to v'}$
+\[
+\alpha_{v \to v'}  = \min{(\frac{\pi_{v'}}{\pi_v}, 1)} = \min{(e^{-\beta(U_{v'}-U_v)}, 1)}
+\]
+4. $i \to i+1;$ if $i < N$ goto 2.
+### Expression for the pressure - the virial theorem
+\[
+pV = Nk_B T + \frac{1}{d} \langle \sum_i \sum_{j>i} \mathbf{r}_{ij} \cdot \mathbf{F}_{ij} \rangle
+\]
+($\mathbf{F} = -\bigtriangledown u$)
+## Ensemble with a  fluctuating volume
+Not sure at all about this parts, lets pray it doesn't come up.
+## The grand cononical ensemble
+Here we can simulate with Monte Carlo too, something that is not possible with Molecular Dynamics. What we do differently though is that we look at state with different amount of particles. We denote the state transition where we go from $N \to N+1$ partictles as going from $i \to j$ and the state transition where we go from $N+1 \to N$ particles as going from $j \to i$.
+
+We then are given that the trial probabilities are
+\[
+q_{ij} = \frac{d\mathbf{r}}{V(N+1)}
+\]
+and
+\[
+q_{ji} = \frac{1}{N+1}
+\]
+With the  acceptance probabilities
+\[
+\alpha_{ij} = \min{(1, \frac{V e^{\beta \mu}}{(N+1) v_Q}e^{-\beta[U(N+1)-U(N)]} )}
+\]
+\[
+\alpha_{ji} = \min{(1, \frac{(N+1) v_Q}{V e^{\beta \mu}}e^{-\beta[U(N)-U(N+1)]} )}
+\]
+Where $\mu$ is the chemical potential. U is whatever interaction and potential we decide to have among the particles
