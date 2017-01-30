@@ -545,3 +545,203 @@ With the  acceptance probabilities
 \alpha_{ji} = \min{(1, \frac{(N+1) v_Q}{V e^{\beta \mu}}e^{-\beta[U(N)-U(N+1)]} )}
 \]
 Where $\mu$ is the chemical potential. U is whatever interaction and potential we decide to have among the particles
+
+#Ch. 4 - The Ising model
+The intro is not very interesting and not on point. It should have been rewritten to discuss Ising model in a more general sense and the structure of the chapter instead.
+
+We do learn that magnetization $M$ is given by
+\[
+M \approx (T_c-T)^{\beta}
+\]
+And we'll refrence this $\beta$ in this section
+## Lattices
+- Points on a length which can inhabit a state.
+- The length of a lattice is $L$ (or the number of points on an axis)
+- The dimension of a lattice is $d$
+- The number of points in a lattice in $N=L^d$
+- Number of neighbors is given by $z=2d$
+- We'll usually treat the boundary of a lattice as periodic.
+- The subscript $L$ will stress that a quantity has a dependence on the system size
+## Definition of the model
+We start with the example of a ferrimagnet, where every point in a ferrimagnet lattice has a spin up or spin down representing it's magnetic affinity. To define this model we apparently need to specify 3 properties
+1. __Possible states on the lattice points:__ For this example we say every lattice point have a spin up or down as state, i.e. $\mathbf{S} =  \uparrow , \downarrow$ or for easier mathematical representation $\mathbf{S} = +1, -1$
+2. __How the points are organized on the lattice:__ Basically the lattice points is where the different states can exists. So evenly spaced out on the lattice, no matter the dimensions.
+3. __An expression for the energy in the system:__ The hamiltonian is $H({s_i}) = -J \sum_{\langle ij \rangle} s_i s_j -h \sum_i s_i$.
+    * {$s_i$} means $[s_1, ..., s_N]$
+    * $j$ is a coupling constant with the dimension energy (lol? LOOOL)
+    * $\sum_{\langle ij \rangle}$ is the sum of all pairs i,j that are nearest neighbors
+    * $h$ is the magnetic field. (It also kinda absorbes the coupling constant between the field and the spins, bah!)
+
+Note that for physical system the only interesting case in when $N \to \infty$, also usually only the time you get interesting phenomenas.
+### Basic properties
+We will usually only look at the model without a magnetic field. The hamiltonian is the $-j$ if a neighbor is equal or $+j$ if its not equal.
+
+It is also said that the behavior of a system is hard to see in general temperatures, so we will mostly look at the limits $T \to 0$ and $T \to \infty$.
+
+#### Low Temp Limit  ($T \to 0$)
+Here $\beta \to \infty$. And if we have $N$ sites and every site has $z$ neighbors we get an energy of $E_0 = -NzJ/2$. And we get two different states that can represent this ground state. All pointing down or all pointing up. we also have __MAXIMUM__ magnetization (bwahaha).
+#### High Temp Limit  ($T \to \infty)
+Here $\beta \to 0$. And $e^{-\beta E_v} = 1$ (The partition function hold for this system since the system has states that has equal probability to exists if they require the same energy). And in this state it's total disorder (no state is the same as its neighbor) Basically then the energy should be so that $\langle E \rangle = 0$ so __NO__ magnitization. Could be seen as total cancellation.
+#### Three possibilities
+Looking at the magnetic model that sais
+\[
+M \approx (T - T_c)^\beta
+\]
+We can look at the magnetic order for different $T_c$, look in book for more and plots etc.
+## Monte Carlo simulation
+### Some Dead Ends
+__complete summation__ of all the states in a computer, so all possible state a system as given can have, and then take average. Very computingly heavy. Quickly explodes so it's take practically infinite time to calculate.
+
+__Randomly generate configurations__ If we only calculate a subset of randomly generate configuration we could find out the mean value for an observable through $\langle A \rangle = \frac{\sum_{v=1}^n A_v e^{-\beta E_V}}{\sum_{v=1}^n e^{-\beta E_V}}$. Sadly this equation breaks pretty fast in a computer. Basically the boltzmann factor($e^{-\beta e_V}$) becomes very small due to large $E_v$ ($E_v$ is dependent on $N$ and $N$ very quickly becomes large.
+
+__Importance sampling__ Basically what we do generate with Markov Chains. Basically a configuration show up with a probability proportional to the boltzmann factor, and thus we can just do a straight average of our observables value on every configuration.
+
+### Metropolis Monte Carlo
+#### Requiremets
+The requirment of having a configuration show up with a probability proportional to the Boltzmann factor is actually obtained through these requirements. (No case is really made about why this is but...)
+1. __Detailed balance.__ $\pi_v p_{vv'} = \pi_{v'} p_{v'v}$
+2. __Ergodicity.__ It should be possible to access the whole phase space through a finite number of steps.
+
+Voila! Every configuration shows up with a probability proportional to the Boltzmann factor! (For some fucking reason, this is getting close to a fucking religion)
+
+#### Implementation
+- Step sequentially over the system.
+- For each site with spin $s_i$ generate a trial configuration $v'$ from $v$ be the change $s_i$ = $-s_i$
+- Calculate the energy change $\Delta$ $E = E_{v'} - E_v$
+- Accept the configuration with probability $\alpha_{vv'} = \min{(e^{-\beta \Delta E}, 1)}$. (Adapted from the general equation for metropolis markov chains discussed in Ch.2). And this apparently follows from $\pi_v \propto e^{-\beta E_v}$ for some reason? Well atleast Boltzmann is in there.
+### Cluster update methods
+An effect of using the given implementation given in previous section is that we get something we call a critical slow down. You see if we look at every state independently and switch with a probability and we have a large system, then configuration following eachother will have very similair structures. Thus we have a high correlation time. The solution is to find some way to change allot at every state change for the configuration.
+
+For cluster methods the basic idea is that we try and construct clusters of spins with the same directions and then flip the whole clusters. We will go through two examples of cluster update methods: Swendsen-Wang and Wolff.
+#### Swendsen-Wang method
+This update method works by (good visualization in book)
+1. Create cluster boundaries:
+    * Between all spins with opposite orientation
+    * With probability $e{-2\beta J}$ between each nearest neighbor pair with _the same_ orientation
+2. Now go through every cluster and flip in with a 50% probability.
+
+Note here the probability that is proportional to Boltzmanns factor is where to put the boundary, not flip the spin as in the Metropolis method.
+#### The  Wolff cluster update method - traditional presentation
+Here we don't put boundaries and then flipp all clusters. We only flip one cluster per step. So in practice we flip state by state after state as we're trying to identify the cluster boundaries for the cluster we're flipping. To implement simply
+1. Initialize
+    1. Choose a staritng position, $i$, randomly
+    2. Store the spin direction: $S = s_i$
+    3. Flip the spin: $s_i = -s_i$.
+    4. Put $i$ in the queue
+2. Repet until empty queue
+    1. Get a position, $i$, from the queue.
+    2. Loop over j, the nearest neigbours of $i$, if $s_j = S$ add the point to the culster with probability $1-e^{-2 \beta J}$, then if we added the point do the following two things aswell
+        * flip the spin, $s_j=-s_j$
+        * Put $j$ into the queue
+
+### Wolf cluster - traditional
+eeeh... skipping! Not much for traditions ;)
+## Mean field theory
+In mean field theory one look at one particle and see its interaction with all other as a field. This field is a mean of all the interactions it usually get. Thus the name "mean field theory". Here we only look at the interactions from a spin from its nearest neighbors once again.
+
+For the ising model here we have the hamiltonian
+\[
+H({s_i}) = -J \sum_{\langle ij \rangle} s_i s_j = -h_i s_i
+\]
+where
+\[
+h_i = J\sum_j s_j
+\]
+Thus the expectation value becomes of $s_i$ becomes (using REF $\langle A \rangle = \frac{\sum_{v=1}^n A_v e^{-\beta E_V}}{\sum_{v=1}^n e^{-\beta E_V}}$
+)
+\[
+\langle s_i \rangle = \frac{e^{\beta h_i} - e^{-\beta h_i}}{ e^{\beta h_i} + e^{-\beta h_i}} = \tanh{(\beta h_i)}
+\]
+And now we approximate and say that $m = \langle s_{i} \rangle$ (note the subscript doesn't matter, and the approximation is intuitive. the average amount of $s_i$ at a certain direction should amount to the magnetization). Thus we can rewrite $h_i = J \sum_j s_j = Jzm$ (recall that $z$ is the number of nearest neighbors). Thus we get
+\[
+ m = \tanh{(\beta J zm)}
+\]
+Now we want to see for what $\beta J z$ we get get a non trivial solution to the equation. Here it's hard without visual aid to argue for this, so i refer to the book. Basically since $m$ in itself is just a straight line we know that in order to have a nontrivial solution we must have
+\[
+ \frac{d \tanh{(\beta J zm)}}{dm}\Bigr|_ {m=0} \gt 1
+\]
+And by doing a taylor expansion $\tanh{x} \approx x-x^3/3$ we can carry out the derivation and end up with a solution if, and only if $\beta_c J z = 1$ ($\beta_c$ must be what is the critical value). And recalling that $\beta = 1/(k_B T_c)$ we get
+
+\[
+k_B T_c = Jz.
+\]
+
+### The exponent $\beta$
+We say that $\beta = 1/2$ for magnetization in the mean field approximation.
+
+We do it by using the expression for the critical $\beta$, also called $\beta_c$ in the previous section
+
+## Energy-entropy argument
+Yet another approximation to check models. The idea is to compare the ground states (lowest energy and of highest ordering) of the system $\Omega_0$ with energy $E_0$ against some other state $\Omega_1$ with some energy $E_1$. The probability to be in either of these(shall call it partitioned states?) is
+\[
+P_0 \propto \Omega_0 e^{-\beta E_0}
+\]
+\[
+P_1 \propto \Omega_1 e^{-\beta E_1}
+\]
+To put this in terms of energy and entropy we use our knowledge of statistical physics and recall (remember $\beta = 1/(k_B T)$ too)
+\[
+S = k_B \ln{\Omega} \to \beta k_B T S = k_B \ln{\Omega} \to \Omega = e^{\beta T S}
+\]
+Which mean we can rewrite the probabilities as
+\[
+P \propto \Omega e^{-\beta E} = e^{-\beta(E-TS)} = e^{-\beta F}
+\]
+where $F$ is the free energy. If we set $\Delta E = E_1 - E_0$ and $\Delta S = S_1 - S_0$ we can se that
+__Disorder wins if $\Delta F = \Delta E - T \Delta S \lt 0$__
+### 1D Ising model
+We look at a system with L+1 sites with the limit $L \to \infty$
+
+Here we have two ground states, i.e. $\Omega_0 = 2$. The ground state energy is (from the hamiltonian we given the system) $E_0 = -JL$
+
+For the other states lets look at the configuration with just one spin changed. There is $\Omega_1 = 2L$ different such states with energy $E_1 = E_0 + 2J$. Giving us
+\[
+\Delta F = \Delta E - T \Delta S = 2J - Tk_B(\ln{(2L)} - \ln{(2)}) =  2J -Tk_B\ln{L}
+\]
+Remember now that we're looking at the limit $L \to \infty$. So basically $\Delta F \lt 0$ aslong as $T \neq 0$. So only in the trivial case should we be in the ground state.
+### 2D Ising model
+Bitt iffy, look in book if needed
+## Exact solutions
+The behavior and complexity of the Ising model is very dependent on the dimensionality. In one dimension the model orders only at  $T=0$ but for $d \ge 2$ there is a transition at finite $T_c$ where the order parameter vanishes as $M \sim (T_c - T)^\beta$.
+
+So now we look at analytical solutions and see how it all really works
+#### One dimensions
+The partition function is (all we get, go back and put into formulas)
+\[
+Z^{1D} = (2 \cosh{\beta J})^N.
+\]
+#### Two dimensions
+The free energy is non-analytic at
+\[
+T_c  = \frac{2}{\ln{(1+ \sqrt{2})}}
+\]
+Such that the heat capapcity $C$ diverges logarithmically
+\[
+C \sim - \ln{|T-T_c|}
+\]
+#### Three dimensions
+Not solved, exists very good Monte Carlo simulations of it though.
+### Dimensionality and the mean field approximation
+Basically comparing the mean field approximation with the real values, doesn't start to get good until 3 dimensions. Values in table inside the book.
+## Behavior at a critical point
+
+### The heat capacity
+### The magnetization
+### Critical exponents related to the magnetization
+### Susceptibility
+### The correlation function
+
+## Universality, RG theory, and scaling
+### Renormalization Group theory
+### The scaling behavior of the free energy
+### Relation to critical exponents
+### Finite size scaling
+### Binder's cumulant
+
+## More on analytical techniques
+### High temperature expansion
+### Low temperature expansion
+### Duality relation
+### The lattice gas
+### Relation between the Ising model and the lattice gas
+### A few words about all the other models
