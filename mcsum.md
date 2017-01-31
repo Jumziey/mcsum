@@ -164,7 +164,7 @@ But for simulations one often has the values $\sum_i x_i$ and $\sum_i x_i^2$ so 
  s^2 = \frac{1}{N-1}(\sum x_i^2 - \frac{1}{N} (\sum x_i)^2)
 \]
 ### Estimation with Correlated variates
-From a simulation you ofter get sequences fo values $x_1,x_2,...$ which are from a dstribution characterized by $\mu$, $\sigma^2$ and some $cov[x_i,x_{i+j}]$. Mean is the same even though the covariance. The istemation of the variance is is changed though.
+From a simulation you often get sequences fo values $x_1,x_2,...$ which are from a distribution characterized by $\mu$, $\sigma^2$ and some $cov[x_i,x_{i+j}]$. Mean is the same even though the covariance. The estimation of the variance is changed through
 \[
 s^2 = \frac{1}{N-1}(\sigma^2+2r^{(J)})
 \]
@@ -526,7 +526,7 @@ pV = Nk_B T + \frac{1}{d} \langle \sum_i \sum_{j>i} \mathbf{r}_{ij} \cdot \mathb
 ($\mathbf{F} = -\bigtriangledown u$)
 ## Ensemble with a  fluctuating volume
 Not sure at all about this parts, lets pray it doesn't come up.
-## The grand cononical ensemble
+## The grand canonical ensemble
 Here we can simulate with Monte Carlo too, something that is not possible with Molecular Dynamics. What we do differently though is that we look at state with different amount of particles. We denote the state transition where we go from $N \to N+1$ partictles as going from $i \to j$ and the state transition where we go from $N+1 \to N$ particles as going from $j \to i$.
 
 We then are given that the trial probabilities are
@@ -598,11 +598,9 @@ __Importance sampling__ Basically what we do generate with Markov Chains. Basica
 
 ### Metropolis Monte Carlo
 #### Requiremets
-The requirment of having a configuration show up with a probability proportional to the Boltzmann factor is actually obtained through these requirements. (No case is really made about why this is but...)
+To make the Ising model fit in a Markov Chain simulation we need two requirments on our Markov Chain.
 1. __Detailed balance.__ $\pi_v p_{vv'} = \pi_{v'} p_{v'v}$
 2. __Ergodicity.__ It should be possible to access the whole phase space through a finite number of steps.
-
-Voila! Every configuration shows up with a probability proportional to the Boltzmann factor! (For some fucking reason, this is getting close to a fucking religion)
 
 #### Implementation
 - Step sequentially over the system.
@@ -698,7 +696,7 @@ For the other states lets look at the configuration with just one spin changed. 
 \[
 \Delta F = \Delta E - T \Delta S = 2J - Tk_B(\ln{(2L)} - \ln{(2)}) =  2J -Tk_B\ln{L}
 \]
-Remember now that we're looking at the limit $L \to \infty$. So basically $\Delta F \lt 0$ aslong as $T \neq 0$. So only in the trivial case should we be in the ground state.
+Remember now that we're looking at the limit $L \to \infty$. So basicaly $\Delta F \lt 0$ aslong as $T \neq 0$. So only in the trivial case should we be in the ground state.
 ### 2D Ising model
 Bitt iffy, look in book if needed
 ## Exact solutions
@@ -724,24 +722,163 @@ Not solved, exists very good Monte Carlo simulations of it though.
 ### Dimensionality and the mean field approximation
 Basically comparing the mean field approximation with the real values, doesn't start to get good until 3 dimensions. Values in table inside the book.
 ## Behavior at a critical point
+At the critical temperature, where the free energy is non-analytic (talking about 2d here), we get various quantities diverge or vanish. This behavior can be described through 4 exponents: $\alpha,\beta,\gamma,\delta$. We will now look at what they are.
 
-### The heat capacity
+These are interessting because they explain the behavior of the system at the non-analytic point for several different models. Thus this model we have been looking at belongs to a _universality class_ (But clumsily presented here but bleh)
+
+###The heat capacity
+There's apparently a jump in energy at the transition point thus $C/N = \frac{d \langle E \rangle}{NdT}$ has $\delta$ like spike. In the continuous phase transition this is given to us to be
+\[
+C \sim | T - T_c|^{-\alpha}
+\]
+And since we now from our limits that
+\[
+\lim_{\alpha\to 0}\frac{1}{\alpha}(x^{-\alpha} - 1) = -\ln{x}
+\]
+Compare these results whith the analytical expression for the heat capacity around the critical point which is $C \sim - \ln{|T-T_c|}$ we can interpret this to mean that $\alpha = 0$
 ### The magnetization
+We define an ensemble average of the magnetization as
+\[
+\langle M \rangle = \frac{1}{Z} \sum_v P_v M_v
+\]
+With magnetization density $\langle m \rangle$
+\[
+\langle m \rangle = \frac{\langle M \rangle}{N}
+\]
+\[
+M_v = \sum_i s_i
+\]
+
+Note how this behaves as the sum of independent magnets. This is in order for the shape to not matter. Funny part is that then the magnetization density should never be anything but nil since one can intuivitely see that $\langle M \rangle = 0$. But in nature it does since close to $T_c$ the system goes from beeing ergodic to non-ergodic. _spontanous symmetry breaking_.
 ### Critical exponents related to the magnetization
-### Susceptibility
+The critical point depends on two things. $T=T_c$ and $h=0$ approaching in it from either variable yeilds in the results (just given to us)
+- $T \to T_c$ from below giveds $\langle m \rangle \sim (T_c - T)^\beta$
+- $h\to 0$ yeilds to us $\langle m \rangle \sim h^{1/\delta}$
+
+From $\delta$ and $\beta$ we can define all others through a table in the book(Using it seemes very confusing right now).
+### Susceptibility $\chi$
+Response to weak applied magnetic field.
+
+In high $T$ we get
+\[
+\chi = \beta N \langle m^2 \rangle
+\]
+At the critical point we get (as $T_c$ is apporached from both sides)(recall only given to us)
+\[
+\chi \sim |T-T_c|^{-\gamma}
+\]
 ### The correlation function
+We are given the correlation function  $g(r)$
+\[
+ g(r) =
+ \begin{cases}
+ g_\infty + Ce^{-r/\xi}, &T<T_c \\
+ r^{-(d-2+\eta)}, & T=T_c \\
+ Ce^{-r/\xi}, &T>T_c
+ \end{cases}
+\]
+Thus we see the exponent $\xi$.
 
+Through some half questionable math the book finds
+\[
+\xi \sim |T-T_c|^{-v}
+\]
 ## Universality, RG theory, and scaling
-### Renormalization Group theory
-### The scaling behavior of the free energy
-### Relation to critical exponents
-### Finite size scaling
-### Binder's cumulant
+Basically so many models exists where they share certain attributes. Thus one can simulate one model an infer knowledge about another, maybe more interesting, model.
 
+A universality class is a class of models which share some variable value, such as these $\beta,\gamma,\xi,\eta$ variables we discussed so far.
+### Renormalization Group theory
+The idea is to consider the effect of a change of scale to the system.
+
+For an example the book brings up an example of a system at a temperature T. We introduce $t = T/T_c -1$ (dimensionless) and want to effect the change the scale of it with a factor $b$ so that $t_b = s(b)t$. This unkown function s(b) must be factor so that if we scale with $b_1$ then $b_2$ it should be the same as scaling with a factor $b_1 b_2$. We therefore have
+\[
+s(b_1 b_2) = s(b_1)s(b_2)
+\]
+which holds for $s(b) = b^y$
+### The scaling behavior of the free energy
+- We have system of size $N=L^d$
+- Lets change scale to $L'= L/b \to N' = N/b^d$
+- Remember $t=T/T_c -1$ still.
+- Recall then that the total free energy should be the same so $F(t,L) = F(t',L')$(atleast at the phase transition). So
+using the free energy density function $f(t,L)$ we get
+\[
+f(t)L^d = {L'}^{d}f(t')
+\]
+\[
+f(t) = \frac{{L'}^d}{L^d}f(t')
+\]
+(recall now that $t' = s(1/b)t = t b^{y_t}$) which gives us
+\[
+f(t) = b^{-d}f(tb^{-y_t})
+\]
+And we can extend this by allowing for a magnetic field too
+\[
+f(t,h) b^{-d}f(tb^{y_t},hb^{y_h})
+\]
+(for some reason this holds true? kind find out why but)
+### Relation to critical exponents
+Now we can derive the expressions in table 4.2 in the book. We get the for instance for magnetization
+\[
+m(t,h) \sim \frac{\partial f}{\partial h}
+\]
+### Finite size scaling
+Its a bit of fine arguments made here look in book. But using the math we have so far we end up with
+\[
+m(t,L) = L^{-\beta / v} \overline{f}_h(tL^{1/v})
+\]
+And this means that plotting $mL^{-\beta/v}$ against $tL^{1/v}$ should collapse on some curve described by $\overline{f}_h$
+
+but since $m = \frac{1}{N} \langle M \rangle$  and $\langle M \rangle = 0$ in a finite system, we have to take square the expression.
+\[
+m^2(t,L) = L^{-2\beta/v} \overline{f}_h^2(tl^{1/v})
+\]
+or
+\[
+\overline{f}_h^2(tL^{1/v}) = m^2 L^{2\beta/v}
+\]
+(and $t = T/T_c -1$) so
+\[
+\overline{f}_h^2((\frac{T}{T_c} - 1)L^{1/v}) = m^2 L^{2\beta/v}
+\]
+### Binder's cumulant
+Now in this last expression we noticed htree unknowns (incase the critical behavior is unknown) $T_c, \beta, v$. And to adjust all these three constants in order to get the plot of $m^2 L^{2\beta/v}$ against $(\frac{T}{T_c} - 1)L^{1/v}$ to collapse can be difficult.
+
+Binders cumulant to the rescue! We can say that
+\[
+Q = \frac{\langle m^2 \rangle^2}{\langle m \rangle^4}
+\]
+And see that its scaleling behavior is
+\[
+Q(t,L) = f_Q(tL^{1/v})
+\]
+
+And use a plot trick to figure out $T_c$ (described in book) Then plot $Q$ vs $(T-T_c)L^{1/v}$ for different $v$ until it collapses and we have only $\beta$ left to fit!
 ## More on analytical techniques
-### High temperature expansion
-### Low temperature expansion
-### Duality relation
-### The lattice gas
-### Relation between the Ising model and the lattice gas
-### A few words about all the other models
+skipping...
+
+# Ch. 5 - Simple stochastic models
+## Scale free behavior
+
+## Site percolation
+### Distribution of cluster sizes
+### Fractal dimension
+### The correlation function
+### The correlation length
+### The order parameter
+### Average size of non-spanning clusters
+### Finite size scaling in percolation
+
+## Random walk
+### Simple random walk
+### Self-avoiding walk
+
+## Self-organized criticality
+### The sand pile model in one dimension
+### The sand pile model in two dimensions
+
+## Cmoplex networks
+### What is a network?
+### Examples of networks
+### Small world networks - Watts & Strogatz
+### Degree distribution - Barabasi & Albert
+### Present research 
