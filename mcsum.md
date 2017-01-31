@@ -858,16 +858,108 @@ skipping...
 
 # Ch. 5 - Simple stochastic models
 ## Scale free behavior
+Basically behavior when the scale doesn't matter. If we zoom in the behavior stay the same, and when we zoom out the behavior stays the same. Or maybe one should say the problem or behavior itself is contained. For instance one can look at the atom proton electron behavior without taking into consideration about how the inner workings of the electron works.
 
+When we have scale free behavior, the behavior itself its like a contained box that is easily destilled into a certain problem.
+
+There's several problems that does not have these properties. For instance
+ - __Turbulance:__ One of the hardest problem in physics today, it has many different scales that together work together to create the phenomena, such as the macroscopic wind and the microscopical connection between water molecules. It's a bitch.
+ - __$1/f$-noise:__ And intresting phenomena that occours just about everywhere.
+ - __And more...__
 ## Site percolation
-### Distribution of cluster sizes
-### Fractal dimension
-### The correlation function
-### The correlation length
-### The order parameter
-### Average size of non-spanning clusters
-### Finite size scaling in percolation
+Very good intro in book, this text assumes you've read it. What should be clearified is that with bound percolation we're looking at the edges of the small squares (as we call the when talking about graphs etc) and with site percolation we're looking at a complete squares themself.
 
+We have two boundary conditions, open and periodic. We have different requirements for percolation. Open boundary condition yields the requirement to be able to go from one side to another perpendicular to that side. With periodic we have the requirement you need to go L amounts of step in either direction in order to have percolation.
+
+We have two probabilities. First one is the probability that the edge or site is occupated ($p$  for site or $p_{bond}$ if we're looking at the edges). Then we have the probability for percolation $P_L(p)$ (The probability depends on $L$ which is the number of sites in a dimension and $p$ which is the probability for a site to be occupated).
+
+The plots in the book very clearly describes what happens with different scale (different values of $L$)
+
+Basically we're showned that we have a critical point in the model for a $p_c$ where the probability for percolation seem to be completely independent of the scale of the model. And that with $L \to \infty$ we have no perculation when $p \lt p_c$ and always perculation when $p \gt p_c$
+### Distribution of cluster sizes
+We get a historgram of cluster sizes, $s$. We get shown how the cluster sizes are distributed basically. By looking at we can see that
+\[
+ H(s) \sim e^{-s/ \mu}
+\]
+where $\mu$ is a characteristic cluster size. Dependent on $L$. Except, ofcourse, when we are at $p_c$. Then the equation seem to (remember were creating these equations from the plots we get from actual simulations.) become different. Hell dare i even say without any characteristic scale involved at all! Just like with the probability for percolation. The equation seem to be
+\[
+H(s) \sim S^{-a}
+\]
+where $a$ is just some fitting constant. This would mean clusters of all sizes exists in the system. So no matter how you zoom in on a system that is very large or zoom out the system will basically look the same.
+### Fractal dimension
+This peculiar behavior makes the perculation in the object a fractal. A less dense object on larger scales. Basically the idea is the relation between mass and the linear extension of an object is usually
+\[
+ m \sim l^d
+\]
+where $d$ is dimension we are in. But fractals is an objct that obey a similar relation but with a $d_f \lt d$. I.e.
+\[
+m_{f} \sim l^{d_f}
+\]
+And this is what just happens with the cluster at critical site occupation probability.
+
+This has the funny effect of completly making the clusters dissapear as $l \to \infty$ (cmon you can see the limit ;) compare $m$ with $m_f$ as $l \to \infty$)
+### The correlation function
+g($\mathbf{r}$) = the probability to find a connected path from an arbitrary occupied position $\mathbf{r'}$ to $\mathbf{r'}+\mathbf{r}$.
+
+If we plot this probability (from simulation) we se that
+\[
+ g(r) \sim e^{-r/\xi}, p \lt p_c
+\]
+where $\xi$ is a characteristic length. While at the critical value $p_c$ or percolation  treshold the behavior is scale free again as
+\[
+g(r) \sim r^{-\eta}, p=p_c
+\]
+### The correlation length
+When taking $p \to 0$ we get
+\[
+\xi = -1/\ln{p}, p\to 0
+\]
+#### Numerical results
+Doing some fine analyzing by looking at the correlation length vs the probability for occupating and plotting the book ses that
+\[
+ \xi \sim |p-p_c|^{-v}
+\]
+#### Radius of gyration and the correlation length
+Overkill i think, ill look into it if need be
+### The order parameter
+In the Ising model we hade the magenetization as the order parameter (Oh really, we did? Funny you would all of a sudden mention that... weird shit) Here we will look at the size of the spanning cluster (i assume the one that is created incase of perculation) But we will also try and see just how its dependent on scale by dividing away its size basically (atleast dimensionally).
+\[
+q^{span} = s^{span}/L^d
+\]
+and $\beta$ is defined for from the vanishing of the order paramater (thank you for telling me this? This is new but.. yeah now we know... And knowing is half the battle!)
+\[
+ q^{span} \sim (p-p_c)^{\beta}
+\]
+
+The book has beautiful plots of how $q^{span}$ looks against $p-p_c$, i encourage you to look at them
+Among other things we come to the conclusion again that we have no clusters as $L \to \infty$
+### Average size of non-spanning clusters
+Well the ones that does not percolate.
+\[
+ S(P) = \frac{1}{N_c} \sum_c^{N_c} s_c
+\]
+like susceptibility acts like
+\[
+ S(p) \sim |p-p_c|^{-\gamma}
+\]
+(with $\gamma = 43/18$ in 2D)
+### Finite size scaling in percolation
+Correlation length
+\[
+\xi \sim |p-p_c|^{-v}
+\]
+In simulations of finite systems one expect behavior close to $p_c$ to be a function of $L/\xi$ (For some reason this very specific thing... Well $L$ is scaling which seemingly is related to critical phenomenas and $\xi$ is the correlation length so not tooo suprising something about that is behaving, inuitively). But equivalent is to say its a function of $(L/\xi)^{1/v}$ (see we just added to it :D so lame argued for) which can be written like $(p-p_c)L^{1/v}$... Well well if  we hav aquantity A with scaling dimension $y_A$ we say that the standard finite size scaling assumption is
+\[
+A_L(p) \sim L^{y_A} f_A ((p-p_c)L^{1/v})
+\]
+phew!
+#### Percolation probability
+Using the percolation probability and collapsing it to $(p-p_c)L^{1/v}$ is the simplest thing we can do apparently. :D
+
+#### The order parameter $q^{span}$
+In orden tho collapse $q^{span}$ on plots $L^{\beta/v} q^{span}$ vs $(p-p_c)L^1/v$
+
+SHOULD DO ONE OF THESE EXAMPLES AS EXERCISE
 ## Random walk
 ### Simple random walk
 ### Self-avoiding walk
@@ -881,4 +973,4 @@ skipping...
 ### Examples of networks
 ### Small world networks - Watts & Strogatz
 ### Degree distribution - Barabasi & Albert
-### Present research 
+### Present research
