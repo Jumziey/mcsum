@@ -48,5 +48,3 @@ for url in testurl:
     code = getResponseCode(url)
     if code != 404:
         print(url +" works!");
-
-#print(getResponseCode("http://www.tp.umu.se/mc"))
