@@ -11,6 +11,13 @@ def getResponseCode(url):
 years = 16
 months = 12-1 #remember +1
 days = 31-1 #remember +1
+endings = [
+    "pdf",
+    "dvi",
+    "txt",
+    "tex"
+]
+
 tests = [""];
 for y in range(years):
     for m in range(months):
@@ -30,17 +37,16 @@ for y in range(years):
             else:
                 day = str(d+1)
 
-            tests.append("t"+year+month+day + ".pdf")
-            tests.append("t"+year+month+day + ".dvi")
-            tests.append("t"+year+month+day + ".txt")
-            tests.append("t"+year+month+day + ".tex")
+            for ending in endings:
+                tests.append("t"+year+month+day + "." + ending)
 
-#for test in tests:
+for test in tests:
+    print(test)
 
 testurl = ["http://www.google.se", "https://docs.python.org/3.0/library/random.html", "http://google.se/aoeuhtnasoeuhtnsaoeu"]
 for url in testurl:
     code = getResponseCode(url)
-    if code == 200:
+    if code != 404:
         print(url +" works!");
 
 #print(getResponseCode("http://www.tp.umu.se/mc"))
