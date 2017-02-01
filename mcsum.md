@@ -961,16 +961,102 @@ In orden tho collapse $q^{span}$ on plots $L^{\beta/v} q^{span}$ vs $(p-p_c)L^1/
 
 SHOULD DO ONE OF THESE EXAMPLES AS EXERCISE
 ## Random walk
+We do this with discrete steps in continuum since the book author sais it should have the same effect.
 ### Simple random walk
+How far do we get after $N$ random walk steps?
+\[
+\mathbf{S} = \sum^N_{i=1} \mathbf{d}_i
+\]
+\[
+\langle \mathbf{d}_i \cdot \mathbf{d}_j \rangle =
+\begin{cases}
+1, &i=j \\
+0, &i\ne 0
+\end{cases}
+\]
+\[
+\langle \mathbf{S}^2 \rangle = \langle \sum_i \mathbf{d}_i \cdot \sum_j \mathbf{d}_j \rangle  = \langle \sum^N_{i=1} \mathbf{d}^2_i \rangle + \langle \sum^N_{i=1} \sum_{j\ne i} \mathbf{d}_i \cdot \mathbf{d}_j \rangle = N
+\]
+So root mean square distance is
+\[
+ \sqrt{\langle \mathbf{S}^2 \rangle} = \sqrt{N}
+\]
 ### Self-avoiding walk
+We could calculate analytically the simple random walk, now we want self-avoiding (i.e. do not cross your own path) and it gets difficult, if not impossible, to solve analytically so we turn to our trusted simulations.
 
-## Self-organized criticality
-### The sand pile model in one dimension
-### The sand pile model in two dimensions
+We go through three ways of doing this
+1. Random generation
+2. Survival biasing
+3. Chain configuration
 
-## Cmoplex networks
-### What is a network?
-### Examples of networks
-### Small world networks - Watts & Strogatz
-### Degree distribution - Barabasi & Albert
-### Present research
+It's important to note that all these methods build upon creating a sub set of all the available configurations for a walk. Thus the generated walks should be somehow representative of the complete set of walks.
+#### Random generalization
+With this method we simply generate random walks and remove the self intersecting ones. We just go on and with every walk we choose $z-1$ directions to go (we never go back from where we came) (remember $z$ is the number of neighbors).
+
+This method quickly becomes costly.
+#### Survival biasing
+In this method we never choose a step that's intersecting. The problem become that we have to weigh every configuration so the set becomes representative of the whole. The weighting is done to each walk as
+\[
+  w_\mu = \prod^N_{i=1} \frac{z_i}{z-1}
+\]
+where $z_i$ is the number of acceptable steps from a certain point $i$ in the walk and $z-1$ is normaly available amounts of step (always removing the backtrack option).
+
+Then we can use this formula to calculate a various quantities (you'll recognize it by now ;) )
+\[
+\langle Q \rangle = \frac{\sum_\mu w_\mu Q_\mu}{\sum_\mu w_\mu}
+\]
+But this again gets hard to calculate for very long walks. So then we have to find and even more efficient algorithm
+#### Chain of configurations
+Idea is to create a valid walk and then modify it. So to initialize we create a valid walk then
+
+1. Choose a point along the chain at random
+2. select a symmetry operation by random and perfom that operation on one part of the chain
+3. Accept this modified chain if it is self-avoiding. Otherwise restore the old configuration.
+4. Measure and collect various properties of the chain.
+
+The symmetry operation can be rotations, reflection or combinations of the two.
+
+The most time consuming is to check for self-avoidance. One need to check for each $0 \le i \le p$ and $p \lt j \le N$ so that $\mathbf{r}_i \neq \mathbf{r}_j$.
+
+Remember just that we get allot of correlation between configurations and that if we start from a straight walk we need some thermalization of the system in order to get a representative system.
+
+## Self-organized criticality and Complex networks
+These chapters are more discussion chapters. It's interesting reading for sure, and it is pretty clear too if one have understood the previous chapters. Read it and enjoy :)
+
+# Ch 6 Quantom Monte Carlo with the SSE method
+## Basic relations for quantum spins
+Basically defining stuff for the system.
+### A single spin
+Here we define $S^{[x,y,z]}$ operaters (spin) and its commutators. We also write spin states ($|\downarrow \rangle$) as vectors we also look at the operators in matrix form. We also look at how we define the step operators ($S^+$ and $S^-$).
+### A model for interacting spin
+We go from the Hamiltonian for the Heisenberg antiferromagnet and then come to the result of
+\[
+H_J = J \sum_{\langle ij \rangle} [S^z_i S^z_j + \frac{1}{2}(S^+_ i S^-_ j +S^-_ i S^+_ j)]
+\]
+### Natural basis vector
+The most onpoint thing said is that we can't solve the hamiltonian directly on the spin configurations we get for in order to measure the energy. What we do is determine the eigenvectors $|\phi_i \rangle$ and  eigenvalues $E_i$ for $H$
+\[
+  H_J |\phi_i \rangle = E_i | \phi_i \rangle
+\]
+But solving this becomes quickly very demanding for larger systems (i.e. system  as small as with 64 different spins just blows up to solving a matrix on the size $10^{19}$), queue Monte Carlo.
+### Expectation values
+Partition function is given to be (we're goin over all configs $\alpha$ here)
+\[
+Z = \sum_{\alpha} \langle \alpha |e^{-\beta H} | \alpha \rangle
+\]
+Dimensless Hamiltonian is $H=H_J/J$, the expectation values then becomes naturally
+\[
+\langle A \rangle = \sum_\alpha \langle \alpha | A(\alpha) e^{-\beta H} | \alpha \rangle
+\]
+
+Seeing this we also know that we want to create configuration in Monte Carlo with probability $\propto \langle \alpha |e^{-\beta H}| \alpha \rangle$. (So guess whats coming up ;) )
+### Expanding the Boltzmann factor, splitting the Hamiltonian and The partition function
+Through some fun mat we get to the expression for the expectance value (and you can clearly see the partition function here aswell)
+\[
+\langle A \rangle = \frac{1}{Z} \sum^\infty_{n=0} \frac{\beta^n}{n!} \sum_{\{\mu_n\}}\sum_{\{b_n\}}\sum_{\alpha} A(\alpha) \langle \alpha | H^{\mu_n}_{b_n} \cdot \cdot \cdot H^{\mu_1}_{b_1} | \alpha \rangle
+\]
+Where $\mu_i$ is a diagonal part or off diagonal part and $b$ is the number of pairs next to eachother i think.
+
+We cant calculate this sum but we can use it to generate configurations via Markov Chains. What we want to generate is $n$, {$b_n$}, {${\mu_n}$} and $\alpha$, its the configuration space we're down with and markoving in.
+
+Then the author gets high.
