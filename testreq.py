@@ -1,5 +1,8 @@
 import urllib.request
 import time
+import datetime
+import calendar
+import os
 
 def getResponseCode(url):
     try:
@@ -10,43 +13,52 @@ def getResponseCode(url):
 
 def tests(years, months, days, endings):
     filenames = [""];
-    for y in range(years):
-        for m in range(months):
-            for d in range(days):
+    for y in years:
+        for m in months:
+            for d in days:
                 if y<10:
                     year = "0" + str(y)
                 else:
                     year = str(y)
 
-                if (m+1)<10:
-                    month = "0" + str(m+1)
+                if (m)<10:
+                    month = "0" + str(m)
                 else:
                     month = str(m+1)
 
-                if(d+1)<10:
-                    day = "0" + str(d+1)
+                if(d)<10:
+                    day = "0" + str(d)
                 else:
-                    day = str(d+1)
+                    day = str(d)
 
-                for ending in endings:
-                    filenames.append("t"+year+month+day + "." + ending)
+                if( calendar.monthrange(2000+y, m)[1]  >= d):
+                    if(datetime.datetime(2000 + y, m, d).weekday() != 6):
+                        for ending in endings:
+                            filenames.append("t"+year+month+day + "." + ending)
     return filenames
 
-years = 16
-months = 12-1 #remember +1
-days = 31-1 #remember +1
+years = [16]
+days = list(range(1,31))
+months = [6,5,8,2]
 endings = [
     "pdf",
     "dvi",
     "txt",
     "tex"
 ]
+'''
+t = tests(years, months, days, endings)
+for test in t:
+    print(test, end='\r')
+print()
+print(len(t))
+time.sleep(2)
+exit()'''
 for test in tests(years, months, days, endings):
-    print(test)
-
-testurl = ["http://www.google.se", "https://docs.python.org/3.0/library/random.html", "http://google.se/aoeuhtnasoeuhtnsaoeu"]
-for url in testurl:
+    url = "an adress you wanna scrape" + test
     code = getResponseCode(url)
-    print(code);
+    #print(code);
+    print(url, end='\r')
     if code == 200:
+        print()
         print(url +" works!");
