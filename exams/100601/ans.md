@@ -154,4 +154,48 @@ __b)__ Solve this equation and show that the system obeys the Boltzmann distribu
 
 __Answer:__
 
-## 8 Conserved-ordor-parameter Ising model (this one and number 7 seems outside the scope of course)
+## 8 Conserved-ordor-parameter Ising model
+__Pre Question:__ The conserved-order-parameter Ising model is defined just  like the regular Ising model butwith the extra condition that the magnetization is fixed M (i.e. a controlparameter of the model). The traditional way of simulating the conserved-order-parameter Ising model is by the Kawasaki algorithm defined as follows on a lattice with $N$ spins.
+1. Start with any configuration of $(N+M)/2$ up-spins and $(N-M)/2$ down-spins
+2. Chose two sites $i$ and $j$ at random
+3. if $v$ is the current spin-configuration, let $\mu$ be the spin configuration where $s_i$ (the value of the spin at site $i$) has the  value that $s_j$ does in $v$ and $s_j$ has the value of $s_i$ in $v$ (basically we swap the spin values between $i$ and $j$ and call this new configuration for $\mu$)
+4. let $\Delta E = H(\mu)-H(v)$ Where $H$ is the Ising Hamiltonian.
+5. if $\Delta E \lt 0$ or with a probability $\exp{(-\beta \Delta E)}$, swap the spin-values of site $i$ and $j$
+6. Go to step 2
+
+Obviuosly the magnetization is constantly M. Our questions are:
+
+__a)__ Define ergodicity.
+
+__Answer:__ ergodicity is that all configurations(or states) can be reached within a finite number of steps
+
+__b)__ Why does the Kawasaki algorithm sample the configurations of the conserved-order-parameter model ergodically?
+
+__Answer:__ We randomly choose the sites to swap. Given enough iteration we have swapped all, and we can do it in a finite number of step since the probability of doing so increases with every step.
+
+__c)__ Define detailed balance.
+
+__Answer:__ We define detailed balance as the probability to reach one state times the probability to move to another state from this state should be equal to the probability of beeing in this new state times the probability to get from the new state to the old.
+
+To clarify: If we have a state $\pi_i$ and a state $\pi_{j}$ and a transition matrix with the elements $p_{row,col}$ we can then write detailed balance as
+\[
+ \pi_i p_{i,j} = \pi_j p_{j,i}
+\]
+
+__d)__ Why does Kawasakis algorithm fullfill detailed balance?
+
+__Answer:__
+We have the same probability to be suggested no matter what. But what about the probabibilty of acceptance? Well given this whwe have detailed balance if the acceptance probability is the same as the probability to be in the new state divided by the probability to be in the old state, or one hundred percent if that's less. I.e if $\alpha_{ij}$ is the probability that we will accept to go from a state $\pi_i$ to a state $\pi_j$ we get
+\[
+ \alpha_{ij} = min(1, \pi_j/\pi_i)
+\]
+
+And this we have due to the way we accept the new state. Due to the intricacies of statistical physics we now that the probability of a certain state with a certain energy to be occupied is described by the boltzmann factor. And that's precisly what we have in $\Delta E$. We have the boltzmann factor of the new state/configuration divided by the boltzmann factor of the old state/configuration. To see that i underline
+\[
+e^{-\beta (E_{new}-E_{old})} = e^{-\beta E_{new}} / e^{-\beta E_{old}}
+\]
+And $E$ and $H$ is the same since $H$ just the hamilitonian, that describes the energy of the configuration.
+
+__e)__
+
+__Answer:__ I am a little baffled by the question sadly dont completely understand what one wants me to pick. Look into what is required for a boltzmann distribution.
