@@ -6,7 +6,7 @@ __a)__ Consider independent, random variables $x_i$ with average $\mu$ and varia
 \]
 What is $\sigma^2_m$, the variance of $m$?
 
-__Answer:__
+__Answer:__ The variance is given through
 \[
  \sigma^2_m = \frac{\sigma^2}{N}
 \]
@@ -14,14 +14,26 @@ where $\sigma^2$ is the variance of the random indepent variables $x_i$.
 
 __b)__ Derive the result
 
-__Answer:__
+__Answer:__ We start by defining a random variable built  from two other random variables $z = x+y$. Where $x$ has the variance $\sigma_x$ and $y$ has the variance $\sigma_y$. We know from other proof that $\mu_x = $\mu_x +\mu_y$ Then we go from the definition of the variance
+\[
+\sigma^2_z = \int \int ((x+y) - (\mu_x+\mu_y))^2 p(x)p(y) dx dy \\
+\int \int ((x-\mu_x) + (y-\mu_y))^2 p(x)p(y) dx dy \\
+\int \int ((x-\mu_x)^2 + (y-\mu_y)^2 + 2(x-\mu_x)(y-\mu_y)) p(x) p(y) dx dy \\
+\int \int ((x-\mu_x)^2 + (y-\mu_y)^2) p(x) p(y) dx dy
+\]
+and  now recall that $\int p(x) dx = 1$ and we can continue
+\[
+ \int (x-\mu_x)^2p(x) p(y) dx dy + \int (y-\mu_y)^2 p(x)p(y) dx dy \\
+ \int (x-\mu_x)^2 p(x) dx + \int (y - \mu_y)^2 p(y) dy \\
+ \sigma^2_x + \sigma^2_y
+\]
 
 __c)__ Specialize to the case where $x_i$ are from a uniform distribution between $-1$ and $1$ and N=100. What is the distribution of $m$?
 
-__Answer:__
+__Answer:__ It has a Gaussian distribution through the central limit theorem. $\mu_x = 0$ and variance $4/12 = 1/3$ (simply use mathematics handbook and find that the variance is $(b-a)^2/12$)
 
 ## 2 Theory behind Markov chains
-__Question:__ A Markov chain may be described as a transition matrix $p_{ij}$. Describe  the three conditions that havo t be fulfilled by thismatrix and motivate why they are necessary.
+__Question:__ A Markov chain may be described as a transition matriffx $p_{ij}$. Describe  the three conditions that havo t be fulfilled by thismatrix and motivate why they are necessary.
 
 __Answer:__
 1. $p_{ij} \leq 1$, this holds for all $i$ and $j$. This is because the elements of the transition matrix represent a probability. Something with a probability above 1 simply just do not make sense
@@ -31,7 +43,7 @@ __Answer:__
 ## 3 1D Ising model
 __Question:__ Show that the 1D Ising model is disordered for all $t \gt 0$
 
-__Answer:__ Check in book if we can do the analytical one or take the energy-entropy argument. And according to  the energy-entropy argument it only holds as we take the limit $L \to \infty$
+__Answer:__ Redo this one through books energy entropy argument
 
 ## Scaling Analysis
 __Question:__ One way to analyze experimental data (or simulations at big lattices) is to plot $m/|t|^a$ versus $h/|t|^c$. Start from $m \sim \partial f / \partial h$ and
@@ -141,3 +153,5 @@ Why?
 __b)__ Solve this equation and show that the system obeys the Boltzmann distribution in the limit $t \to \infty$
 
 __Answer:__
+
+## 8 Conserved-ordor-parameter Ising model (this one and number 7 seems outside the scope of course)
