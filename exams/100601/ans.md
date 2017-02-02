@@ -122,7 +122,21 @@ __Pre Question:__  A simple system has two states 0 and 1 with energies $E_0$ an
 
 __a)__ Express $\frac{dw_0}{dt}$ in terms of $\beta$, $R_0$ and $E_1$
 
-__Answer:__ What must
+__Answer:__ We know that $w_0 + w_1 = 1$ and the derivate is given by
+\[
+\frac{dw_0}{dt} = \\
+(\text{Probability of state 0} \times \text{Probality of a change to state 1}) \\
+minus \\
+(\text{Probability of state 1} \times \text{Probality of a change to state 0})
+\]
+bububu
+\[
+\frac{dw_0}{dt} = w_0R_0e^{-\beta (E_1 - E_0)}
+\]
+
+Why?
+
+
 
 __b)__ Solve this equation and show that the system obeys the Boltzmann distribution in the limit $t \to \infty$
 
