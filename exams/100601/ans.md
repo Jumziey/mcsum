@@ -14,7 +14,7 @@ where $\sigma^2$ is the variance of the random indepent variables $x_i$.
 
 __b)__ Derive the result
 
-__Answer:__ We start by defining a random variable built  from two other random variables $z = x+y$. Where $x$ has the variance $\sigma_x$ and $y$ has the variance $\sigma_y$. We know from other proof that $\mu_x = $\mu_x +\mu_y$ Then we go from the definition of the variance
+__Answer:__ We start by defining a random variable built  from two other random variables $z = x+y$. Where $x$ has the variance $\sigma_x$ and $y$ has the variance $\sigma_y$. We know from other proof that $\mu_x = \mu_x +\mu_y$ Then we go from the definition of the variance
 \[
 \sigma^2_z = \int \int ((x+y) - (\mu_x+\mu_y))^2 p(x)p(y) dx dy \\
 \int \int ((x-\mu_x) + (y-\mu_y))^2 p(x)p(y) dx dy \\
@@ -41,9 +41,46 @@ __Answer:__
 3. The sum of a row must be equal to one in the transitions matrix, or $\sum_j p_{ij} = 1$ (note that this depends on how the transition matrix is applied, it could just aswell be the columns that need to sum up to 1). This is because we let the row of the transition matrix represent how a state can move on from one state to another. And at such a state transition we need to go somewhere, if we have 10% probability of nothing... What would that even represent?
 
 ## 3 1D Ising model
-__Question:__ Show that the 1D Ising model is disordered for all $t \gt 0$
+__Question:__ Show that the 1D Ising model is disordered for all $T \gt 0$
 
-__Answer:__ Redo this one through books energy entropy argument
+__Answer:__ Using the Entropy-Energy argument. Basically in order to prove this we start by looking at the ground state and look for the probability to be there against the probability to be in a higher energy state, or in this case the ground state must be the orderered state and the higher energy states needs to be the disordered state. This comes from the Hamilitonian of the Ising model:  $H(\{s_i\}) = -J\sum_{\langle ij \rangle} s_i s_j - \sum_i s_i$
+
+But i digress. Lets start by looking at the probability to be in a state. This probability comes from the Boltzmann factor (Well we are dealing with statistical physics). so we could define our ground state as
+\[
+P_0 = \Omega_0 e^{-\beta E_0}
+\]
+Where P_0 is the probability to be in a state $0$ and $\Omega_0$ is the amount of ground states and $E_0$ is the energy in the ground state (ordered one). The probability to be in a state just higher then this is
+\[
+P_1 = \Omega_1 e^{-\beta E_1}
+\]
+But we also know some cool stuff from our statistical physics background, namely
+\[
+ S = k_B \ln{\Omega}
+\]
+Where $S$ is the entropy, which gives us
+\[
+ \Omega = e^{S/(k_B)} = e^{\beta T S}
+\]
+Which gives us
+\[
+ P_x = e^{\beta( T S - E)}
+\]
+or
+\[
+P_x = e^{-\beta (E - T S)} = e^{-\beta F}
+\]
+where $F$ is the free energy
+
+We can now see that if we define $\Delta F = F_1 - F_0$ we now that we will only get predominaly get the ground state if $\Delta F > 0$. Note also that $\Delta F$ could be written $\Delta E - T \Delta S$
+
+Now to prove the statement. Well the statement only holds for $L \to \infty$ in the 1D lattice (im just saying it up front).
+
+We start with looking at the amount of available states in the ordered state and the state that has 1 flipped state (we're only looking at these two as possible). We start with $\Omega_0 = 2$ since it's all up or all down. The energy of the first state is given by $E_0$. We also have $\Omega_1 = 2L$, this is because every spin could be flipped compared to the rest of the configuration, either up or down. So we look at $\Delta F$
+\[
+ \Delta F = \Delta E - T \Delta S = (E_1 - E_0) - T \Delta S = \Delta E - (k_B T (\ln{2L} - \ln{2})) \\
+ ... = \Delta E - k_B T \ln{(L)}
+\]
+And since we're looking at $L \to \infty$ Well, we sure as hell has a extremly negative $\Delta F$ so no chance for ground state unless ofcourse $T=0$ and remove the term all together. (No math weirdness due to $\infty$ time $0$ here, its only a fake physical $\infty$ so $0$ wins)
 
 ## Scaling Analysis
 __Question:__ One way to analyze experimental data (or simulations at big lattices) is to plot $m/|t|^a$ versus $h/|t|^c$. Start from $m \sim \partial f / \partial h$ and
